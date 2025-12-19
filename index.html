@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>年度绘画总结</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f8f8;
+            background-image: linear-gradient(rgba(220, 220, 220, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(220, 220, 220, 0.3) 1px, transparent 1px);
+            background-size: 20px 20px;
+            padding: 15px;
+            color: #333;
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #ddd;
+            position: relative;
+            width: 100%;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+            word-break: break-word;
+        }
+        
+        .header::before,
+        .header::after {
+            content: "✎";
+            position: absolute;
+            top: 10px;
+            font-size: 1.2rem;
+            color: #555;
+        }
+        
+        .header::before {
+            left: 10px;
+        }
+        
+        .header::after {
+            right: 10px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        /* 移动端优化 */
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            .header h1 {
+                font-size: 1.5rem;
+                letter-spacing: 2px;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+        /* 小屏幕移动端优化 */
+        
+        @media (max-width: 400px) {
+            body {
+                padding: 5px;
+            }
+            .container {
+                padding: 10px;
+            }
+            .header h1 {
+                font-size: 1.3rem;
+                letter-spacing: 1px;
+                margin-bottom: 10px;
+            }
+            .header::before,
+            .header::after {
+                display: none;
+                /* 在小屏幕上隐藏装饰符号 */
+            }
+            .grid {
+                gap: 10px;
+            }
+        }
+        
+        .month-card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+            background-color: white;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        .month-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .month-title {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            position: relative;
+            word-break: break-word;
+        }
+        
+        .month-title::before {
+            content: "❖";
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+        
+        .image-container {
+            width: 100%;
+            height: 160px;
+            border: 1px dashed #aaa;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            background-color: #f9f9f9;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .image-container:active {
+            background-color: #e8e8e8;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .image-placeholder {
+            color: #888;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 0 10px;
+        }
+        
+        .image-placeholder::before {
+            content: "🖼";
+            display: block;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .thoughts {
+            min-height: 80px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            cursor: text;
+            position: relative;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .thoughts:empty:before {
+            content: "点击此处写下本月的绘画感想...";
+            color: #aaa;
+            font-size: 0.8rem;
+        }
+        
+        .thoughts:focus {
+            outline: 2px solid #333;
+            outline-offset: -1px;
+        }
+        /* 移动端编辑优化 */
+        
+        @media (max-width: 768px) {
+            .month-title {
+                font-size: 1.1rem;
+            }
+            .image-container {
+                height: 140px;
+            }
+            .thoughts {
+                min-height: 70px;
+                font-size: 0.8rem;
+            }
+            .thoughts:empty:before {
+                font-size: 0.75rem;
+            }
+        }
+        
+        .save-btn {
+            display: block;
+            margin: 30px auto 0;
+            padding: 12px 25px;
+            background-color: white;
+            border: 1px solid #333;
+            color: #333;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 44px;
+            /* 移动端最小触摸目标大小 */
+            min-width: 120px;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .save-btn:hover,
+        .save-btn:active {
+            background-color: #333;
+            color: white;
+        }
+        
+        .save-btn::before {
+            content: "⬇";
+            margin-right: 6px;
+        }
+        
+        .clear-btn {
+            display: block;
+            margin: 10px auto 0;
+            padding: 10px 20px;
+            background-color: white;
+            border: 1px solid #aaa;
+            color: #666;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 44px;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .clear-btn:hover,
+        .clear-btn:active {
+            background-color: #f5f5f5;
+            border-color: #888;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.75rem;
+            color: #777;
+            line-height: 1.4;
+        }
+        
+        .decoration {
+            position: absolute;
+            font-size: 1rem;
+            color: #555;
+            opacity: 0.5;
+            display: none;
+            /* 默认隐藏装饰，移动端不显示 */
+        }
+        /* 桌面端显示装饰 */
+        
+        @media (min-width: 769px) {
+            .decoration {
+                display: block;
+            }
+            .dec-1 {
+                top: 10%;
+                left: 5%;
+            }
+            .dec-2 {
+                top: 20%;
+                right: 7%;
+            }
+            .dec-3 {
+                bottom: 15%;
+                left: 8%;
+            }
+            .dec-4 {
+                bottom: 25%;
+                right: 5%;
+            }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            left: 20px;
+            background: #333;
+            color: white;
+            padding: 12px;
+            border-radius: 4px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* 移动端通知位置调整 */
+        
+        @media (max-width: 768px) {
+            .notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+        }
+        
+        .progress-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            flex-direction: column;
+        }
+        
+        .progress-overlay.active {
+            display: flex;
+        }
+        
+        .progress-text {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #333;
+            text-align: center;
+            max-width: 90%;
+            padding: 0 15px;
+        }
+        /* 移动端进度提示优化 */
+        
+        @media (max-width: 768px) {
+            .progress-text {
+                font-size: 0.9rem;
+                margin-top: 15px;
+            }
+        }
+        
+        .storage-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            margin: 0 0 15px 0;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #856404;
+            text-align: center;
+            display: none;
+            line-height: 1.4;
+        }
+        
+        .storage-warning.show {
+            display: block;
+        }
+        /* 移动端触摸优化 */
+        
+        [contenteditable="true"],
+        .image-container,
+        button {
+            -webkit-user-select: auto;
+            user-select: auto;
+        }
+        /* 防止iOS Safari缩放 */
+        
+        input,
+        textarea,
+        select,
+        button {
+            font-size: 16px;
+        }
+        /* 防止长按弹出菜单 */
+        
+        .month-card,
+        .image-container,
+        .save-btn,
+        .clear-btn {
+            -webkit-touch-callout: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="notification" id="notification"></div>
+
+    <div class="progress-overlay" id="progressOverlay">
+        <div style="font-size: 2.5rem; color: #333;">✎</div>
+        <div class="progress-text" id="progressText">正在处理图片...</div>
+    </div>
+
+    <div class="container" id="capture">
+        <div class="storage-warning" id="storageWarning">
+            注意：浏览器存储空间有限，系统会智能压缩图片。建议定期导出保存您的作品。
+        </div>
+
+        <div class="header">
+            <h1 contenteditable="true">年度绘画总结</h1>
+        </div>
+
+        <div class="grid">
+            <!-- 1月到12月的卡片 -->
+            <div class="month-card" data-month="1">
+                <h3 class="month-title" contenteditable="true">1月</h3>
+                <div class="image-container">
+                    <div class="image-placeholder">点击上传图片</div>
+                </div>
+                <div class="thoughts" contenteditable="true"></div>
+            </div>
+
+            <div class="month-card" data-month="2">
+                <h3 class="month-title" contenteditable="true">2月</h3>
+                <div class="image-container">
+                    <div class="image-placeholder">点击上传图片</div>
+                </div>
+                <div class="thoughts" contenteditable="true"></div>
+            </div>
+
+            <div class="month-card" data-month="3">
+                <h3 class="month-title" contenteditable="true">3月</h3>
+                <div class="image-container">
+                    <div class="image-placeholder">点击上传图片</div>
+                </div>
+                <div class="thoughts" contenteditable="true"></div>
+            </div>
+
+            <div class="month-card" data-month="4">
+                <h3 class="month-title" contenteditable="true">4月</h3>
+                <div class="image-container">
+                    <div class="image-placeholder">点击上传图片</div>
+                </div>
+                <div class="thoughts" contenteditable="true"></div>
+            </div>
+
+            <div class="month-card" data-month="5">
+                <h3 class="month-title" contenteditable="true">5月</h3>
+                <div class="image-container">
+                    <div class="image-placeholder">点击上传图片</div>
+                </div>
+                <div class="thoughts" contenteditable="true"></div>
+            </div>
+
+            <div class="month-card" data-month="6">
+                <h3 class="month-title" contenteditable="true">6月</h3>
+                <div class="image-container">
+                    <div class="image-placeholder">点击上传图片</div>
+                </div>
+                <div class="thoughts" contenteditable="true"></div>
+            </div>
+
+            <div class="month-card" data-month="7">
+                <h3 class="month-title" contenteditable="true">7月</h3>
+                <div class="image-container">
+                    <div class="image-placeholder">点击上传图片</div>
+                </div>
+                <div class="thoughts" contenteditable="true"></div>
+            </div>
+
+            <div class="month-card" data-month="8">
+                <h3 class="month-title" contenteditable="true">8月</h3>
+                <div class="image-container">
+                    <div class="image-placeholder">点击上传图片</div>
+                </div>
+                <div class="thoughts" contenteditable="true"></div>
+            </div>
+
+            <div class="month-card" data-month="9">
+                <h3 class="month-title" contenteditable="true">9月</h3>
+                <div class="image-container">
+                    <div class="image-placeholder">点击上传图片</div>
+                </div>
+                <div class="thoughts" contenteditable="true"></div>
+            </div>
+
+            <div class="month-card" data-month="10">
+                <h3 class="month-title" contenteditable="true">10月</h3>
+                <div class="image-container">
+                    <div class="image-placeholder">点击上传图片</div>
+                </div>
+                <div class="thoughts" contenteditable="true"></div>
+            </div>
+
+            <div class="month-card" data-month="11">
+                <h3 class="month-title" contenteditable="true">11月</h3>
+                <div class="image-container">
+                    <div class="image-placeholder">点击上传图片</div>
+                </div>
+                <div class="thoughts" contenteditable="true"></div>
+            </div>
+
+            <div class="month-card" data-month="12">
+                <h3 class="month-title" contenteditable="true">12月</h3>
+                <div class="image-container">
+                    <div class="image-placeholder">点击上传图片</div>
+                </div>
+                <div class="thoughts" contenteditable="true"></div>
+            </div>
+        </div>
+
+        <button class="save-btn" id="saveBtn">保存为图片</button>
+        <button class="clear-btn" id="clearBtn">清除所有图片</button>
+
+        <div class="footer">
+            <p>点击任何文字区域进行编辑 | 点击图片区域上传图片 | 点击空白处保存</p>
+        </div>
+
+        <!-- 装饰元素 -->
+        <div class="decoration dec-1">✎</div>
+        <div class="decoration dec-2">❖</div>
+        <div class="decoration dec-3">◈</div>
+        <div class="decoration dec-4">✦</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 显示通知
+            function showNotification(message, duration = 3000) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.classList.add('show');
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, duration);
+            }
+
+            // 显示/隐藏进度覆盖层
+            function showProgress(text) {
+                const overlay = document.getElementById('progressOverlay');
+                const progressText = document.getElementById('progressText');
+                progressText.textContent = text;
+                overlay.classList.add('active');
+            }
+
+            function hideProgress() {
+                const overlay = document.getElementById('progressOverlay');
+                overlay.classList.remove('active');
+            }
+
+            // 显示存储警告
+            function showStorageWarning() {
+                document.getElementById('storageWarning').classList.add('show');
+            }
+
+            // 隐藏存储警告
+            function hideStorageWarning() {
+                document.getElementById('storageWarning').classList.remove('show');
+            }
+
+            // 高级图片压缩函数 - 针对画作优化
+            function compressArtImage(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+
+                    reader.onload = function(event) {
+                        const img = new Image();
+                        img.src = event.target.result;
+
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+
+                            // 针对显示需要设置最大尺寸 - 保持宽高比
+                            // 因为最终显示区域只有300x180px，我们不需要保存太大的图片
+                            const MAX_WIDTH = 800; // 最大宽度
+                            const MAX_HEIGHT = 600; // 最大高度
+
+                            // 如果图片很大，先进行缩小
+                            if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                                const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+                                width = Math.floor(width * ratio);
+                                height = Math.floor(height * ratio);
+                            }
+
+                            // 设置canvas尺寸
+                            canvas.width = width;
+                            canvas.height = height;
+
+                            const ctx = canvas.getContext('2d');
+
+                            // 填充白色背景
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(0, 0, width, height);
+
+                            // 绘制图片
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            // 动态调整质量 - 更激进的压缩策略
+                            let quality = 0.5; // 默认质量降低到0.5
+
+                            // 根据原始文件大小进一步调整
+                            if (file.size > 15 * 1024 * 1024) { // 大于15MB
+                                quality = 0.4;
+                            } else if (file.size > 10 * 1024 * 1024) { // 大于10MB
+                                quality = 0.45;
+                            } else if (file.size > 5 * 1024 * 1024) { // 大于5MB
+                                quality = 0.5;
+                            } else if (file.size > 2 * 1024 * 1024) { // 大于2MB
+                                quality = 0.6;
+                            } else { // 小于2MB
+                                quality = 0.7;
+                            }
+
+                            // 转换为压缩后的base64
+                            const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+
+                            // 检查压缩后的大小
+                            const base64Length = compressedBase64.length;
+                            const sizeInMB = (base64Length * 3 / 4) / (1024 * 1024); // 近似计算MB大小
+
+                            console.log(`原始大小: ${(file.size / (1024*1024)).toFixed(2)}MB, 压缩后: ${sizeInMB.toFixed(2)}MB`);
+
+                            // 如果压缩后仍然大于1MB，尝试进一步压缩
+                            if (sizeInMB > 1) {
+                                console.log('图片仍然较大，进行二次压缩...');
+                                // 二次压缩：进一步降低尺寸和质量
+                                const secondaryCanvas = document.createElement('canvas');
+                                const secondaryRatio = 0.7; // 进一步缩小30%
+                                secondaryCanvas.width = Math.floor(width * secondaryRatio);
+                                secondaryCanvas.height = Math.floor(height * secondaryRatio);
+
+                                const secondaryCtx = secondaryCanvas.getContext('2d');
+                                secondaryCtx.fillStyle = '#ffffff';
+                                secondaryCtx.fillRect(0, 0, secondaryCanvas.width, secondaryCanvas.height);
+                                secondaryCtx.drawImage(img, 0, 0, secondaryCanvas.width, secondaryCanvas.height);
+
+                                const finalQuality = Math.max(0.3, quality * 0.8); // 进一步降低质量
+                                const finalBase64 = secondaryCanvas.toDataURL('image/jpeg', finalQuality);
+                                resolve(finalBase64);
+                            } else {
+                                resolve(compressedBase64);
+                            }
+                        };
+
+                        img.onerror = reject;
+                    };
+
+                    reader.onerror = reject;
+                });
+            }
+
+            // 图片上传功能 - 移动端优化
+            const imageContainers = document.querySelectorAll('.image-container');
+
+            imageContainers.forEach(container => {
+                // 添加触摸事件处理
+                let touchStartTime = 0;
+
+                container.addEventListener('touchstart', function(e) {
+                    touchStartTime = Date.now();
+                    // 防止触发滚动
+                    if (e.touches.length === 1) {
+                        e.preventDefault();
+                    }
+                }, {
+                    passive: false
+                });
+
+                container.addEventListener('touchend', function(e) {
+                    const touchDuration = Date.now() - touchStartTime;
+                    // 防止误触，只有短按才触发上传
+                    if (touchDuration < 500) {
+                        triggerImageUpload(this);
+                    }
+                });
+
+                // 保留原有的点击事件
+                container.addEventListener('click', function(e) {
+                    // 在移动端，如果已经处理了触摸事件，则忽略点击事件
+                    if ('ontouchstart' in window) {
+                        e.preventDefault();
+                    } else {
+                        triggerImageUpload(this);
+                    }
+                });
+            });
+
+            // 触发图片上传的通用函数
+            function triggerImageUpload(container) {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.style.display = 'none';
+
+                // 移动端优化：使用capture属性允许直接调用相机
+                if ('ontouchstart' in window) {
+                    input.setAttribute('capture', 'environment');
+                }
+
+                input.onchange = async function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // 检查文件大小 - 增加到20MB
+                        if (file.size > 20 * 1024 * 1024) { // 20MB
+                            showNotification('图片太大，请选择小于20MB的图片');
+                            return;
+                        }
+
+                        showProgress('正在压缩图片...');
+
+                        try {
+                            // 压缩图片
+                            const compressedImage = await compressArtImage(file);
+
+                            const img = document.createElement('img');
+                            img.src = compressedImage;
+
+                            // 清空容器并添加图片
+                            container.innerHTML = '';
+                            container.appendChild(img);
+
+                            // 保存到本地存储
+                            const month = container.closest('.month-card').getAttribute('data-month');
+
+                            // 尝试存储图片
+                            try {
+                                localStorage.setItem(`painting-image-${month}`, compressedImage);
+                                showNotification('图片已保存');
+
+                                // 更新存储时间戳，用于LRU算法
+                                localStorage.setItem(`painting-time-${month}`, Date.now().toString());
+
+                                // 检查并清理存储空间
+                                manageStorageSpace();
+                            } catch (storageError) {
+                                console.error('存储失败:', storageError);
+                                showProgress('存储空间不足，正在清理...');
+
+                                // 强制清理存储空间
+                                const success = await forceClearStorage();
+
+                                if (success) {
+                                    // 再次尝试保存
+                                    try {
+                                        localStorage.setItem(`painting-image-${month}`, compressedImage);
+                                        localStorage.setItem(`painting-time-${month}`, Date.now().toString());
+                                        showNotification('存储空间已清理，图片已保存');
+                                    } catch (retryError) {
+                                        console.error('重试存储失败:', retryError);
+                                        showNotification('图片太大，无法保存到本地存储');
+                                    }
+                                } else {
+                                    showNotification('存储空间不足，无法保存图片');
+                                }
+                            }
+                        } catch (error) {
+                            console.error('图片处理失败:', error);
+                            showNotification('图片处理失败，请重试');
+                        } finally {
+                            hideProgress();
+                        }
+                    }
+                };
+
+                // 移动端特殊处理
+                if ('ontouchstart' in window) {
+                    // 在移动端，直接触发点击
+                    input.click();
+                } else {
+                    // 在桌面端，将input添加到DOM并触发点击
+                    document.body.appendChild(input);
+                    input.click();
+                    setTimeout(() => {
+                        document.body.removeChild(input);
+                    }, 100);
+                }
+            }
+
+            // 存储空间管理函数 - 使用LRU算法
+            function manageStorageSpace() {
+                try {
+                    // 收集所有存储的图片信息
+                    const imageEntries = [];
+
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key.startsWith('painting-image-')) {
+                            const month = key.replace('painting-image-', '');
+                            const timestamp = localStorage.getItem(`painting-time-${month}`) || '0';
+                            imageEntries.push({
+                                month: month,
+                                timestamp: parseInt(timestamp),
+                                size: localStorage.getItem(key).length
+                            });
+                        }
+                    }
+
+                    // 按时间戳排序，最早的在前
+                    imageEntries.sort((a, b) => a.timestamp - b.timestamp);
+
+                    // 计算总大小
+                    const totalSize = imageEntries.reduce((sum, entry) => sum + entry.size, 0);
+                    const maxSize = 4 * 1024 * 1024; // 限制为4MB
+
+                    // 如果超过限制，删除最旧的图片直到满足限制
+                    if (totalSize > maxSize) {
+                        showStorageWarning();
+
+                        let currentSize = totalSize;
+                        for (let i = 0; i < imageEntries.length && currentSize > maxSize; i++) {
+                            const entry = imageEntries[i];
+                            localStorage.removeItem(`painting-image-${entry.month}`);
+                            localStorage.removeItem(`painting-time-${entry.month}`);
+                            currentSize -= entry.size;
+                            console.log(`清理了 ${entry.month}月的图片`);
+                        }
+                    } else {
+                        hideStorageWarning();
+                    }
+                } catch (e) {
+                    console.error('存储管理错误:', e);
+                }
+            }
+
+            // 强制清理存储空间
+            async function forceClearStorage() {
+                return new Promise((resolve) => {
+                    try {
+                        // 先清理所有图片
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const key = localStorage.key(i);
+                            if (key.startsWith('painting-image-')) {
+                                localStorage.removeItem(key);
+                            }
+                            if (key.startsWith('painting-time-')) {
+                                localStorage.removeItem(key);
+                            }
+                        }
+
+                        // 然后清理其他可能的大数据
+                        const keysToKeep = [
+                            'header-title',
+                            'month-title-1', 'month-title-2', 'month-title-3', 'month-title-4',
+                            'month-title-5', 'month-title-6', 'month-title-7', 'month-title-8',
+                            'month-title-9', 'month-title-10', 'month-title-11', 'month-title-12',
+                            'thoughts-1', 'thoughts-2', 'thoughts-3', 'thoughts-4',
+                            'thoughts-5', 'thoughts-6', 'thoughts-7', 'thoughts-8',
+                            'thoughts-9', 'thoughts-10', 'thoughts-11', 'thoughts-12'
+                        ];
+
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const key = localStorage.key(i);
+                            if (!keysToKeep.includes(key)) {
+                                localStorage.removeItem(key);
+                            }
+                        }
+
+                        resolve(true);
+                    } catch (e) {
+                        console.error('强制清理失败:', e);
+                        resolve(false);
+                    }
+                });
+            }
+
+            // 从本地存储加载图片
+            document.querySelectorAll('.month-card').forEach(card => {
+                const month = card.getAttribute('data-month');
+                const savedImage = localStorage.getItem(`painting-image-${month}`);
+                const imageContainer = card.querySelector('.image-container');
+
+                if (savedImage) {
+                    imageContainer.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = savedImage;
+                    imageContainer.appendChild(img);
+                }
+            });
+
+            // 保存编辑内容 - 移动端优化
+            const editableElements = document.querySelectorAll('[contenteditable="true"]');
+
+            editableElements.forEach(element => {
+                // 从本地存储加载内容
+                const card = element.closest('.month-card');
+                const month = card ? card.getAttribute('data-month') : 'header';
+
+                let key;
+                if (element.classList.contains('month-title')) {
+                    key = `month-title-${month}`;
+                } else if (element.classList.contains('thoughts')) {
+                    key = `thoughts-${month}`;
+                } else {
+                    key = 'header-title';
+                }
+
+                const savedContent = localStorage.getItem(key);
+                if (savedContent) {
+                    element.innerHTML = savedContent;
+                }
+
+                // 移动端优化：添加输入事件实时保存
+                let saveTimeout;
+                element.addEventListener('input', function() {
+                    clearTimeout(saveTimeout);
+                    saveTimeout = setTimeout(() => {
+                        saveContent(element);
+                    }, 1000);
+                });
+
+                // 保存内容
+                element.addEventListener('blur', function() {
+                    saveContent(element);
+                });
+            });
+
+            // 保存内容的通用函数
+            function saveContent(element) {
+                const card = element.closest('.month-card');
+                const month = card ? card.getAttribute('data-month') : 'header';
+
+                let key;
+                if (element.classList.contains('month-title')) {
+                    key = `month-title-${month}`;
+                } else if (element.classList.contains('thoughts')) {
+                    key = `thoughts-${month}`;
+                } else {
+                    key = 'header-title';
+                }
+
+                try {
+                    localStorage.setItem(key, element.innerHTML);
+                } catch (e) {
+                    // 文字内容很小，一般不会超限
+                }
+            }
+
+            // 导出功能 - 移动端优化
+            document.getElementById('saveBtn').addEventListener('click', async function() {
+                // 禁用按钮，防止重复点击
+                this.disabled = true;
+                this.textContent = '正在生成图片...';
+                showProgress('正在生成总结图片...');
+
+                try {
+                    // 生成图片
+                    const canvas = await html2canvas(document.getElementById('capture'), {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        backgroundColor: '#ffffff'
+                    });
+
+                    const link = document.createElement('a');
+                    link.download = `年度绘画总结_${new Date().toISOString().slice(0, 10)}.png`;
+                    link.href = canvas.toDataURL('image/png');
+
+                    // 移动端特殊处理
+                    if ('ontouchstart' in window) {
+                        // 在移动端，使用新的窗口打开
+                        window.open(link.href, '_blank');
+                        showNotification('图片生成完成，请在浏览器中下载');
+                    } else {
+                        // 在桌面端，直接下载
+                        link.click();
+                        showNotification('图片保存成功，正在下载...');
+                    }
+                } catch (error) {
+                    console.error('生成图片失败:', error);
+                    showNotification('生成图片失败，请重试');
+                } finally {
+                    // 恢复按钮状态
+                    this.disabled = false;
+                    this.textContent = '保存为图片';
+                    hideProgress();
+                }
+            });
+
+            // 清除所有图片按钮
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                if (confirm('确定要清除所有上传的图片吗？文字内容将保留。')) {
+                    showProgress('正在清除图片...');
+
+                    try {
+                        // 清除所有图片
+                        for (let i = 1; i <= 12; i++) {
+                            localStorage.removeItem(`painting-image-${i}`);
+                            localStorage.removeItem(`painting-time-${i}`);
+
+                            // 重置显示
+                            const container = document.querySelector(`.month-card[data-month="${i}"] .image-container`);
+                            if (container) {
+                                container.innerHTML = '<div class="image-placeholder">点击上传图片</div>';
+                            }
+                        }
+
+                        showNotification('所有图片已清除');
+                        hideStorageWarning();
+                    } catch (e) {
+                        console.error('清除图片失败:', e);
+                        showNotification('清除失败');
+                    } finally {
+                        hideProgress();
+                    }
+                }
+            });
+
+            // 初始化时检查存储状态
+            setTimeout(() => {
+                manageStorageSpace();
+                showNotification('支持上传20MB以内的图片，系统会智能压缩处理', 5000);
+            }, 1000);
+
+            // 移动端虚拟键盘处理
+            let viewportMeta = document.querySelector('meta[name="viewport"]');
+            if (viewportMeta && 'ontouchstart' in window) {
+                document.addEventListener('focusin', function() {
+                    viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+                });
+
+                document.addEventListener('focusout', function() {
+                    setTimeout(() => {
+                        viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+                    }, 100);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
