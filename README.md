@@ -1,6 +1,8 @@
 # MonthlyCanvas
-A simple, browser-based tool to upload and showcase your monthly artwork — perfect for creating a visual year-in-review.
-一个轻量级的网页工具，用于上传并展示你每月的绘画作品，轻松制作属于你的年度艺术回顾。
+- A simple, browser-based tool to upload and showcase your monthly artwork — perfect for creating a visual year-in-review.
+- 一个轻量级的网页工具，用于上传并展示你每月的绘画作品，轻松制作属于你的年度艺术回顾。
+- 当然也可以用来记录任何年度总结，这里提供了12个相片与灵感空位，可以用来作为旅行总结、宠物成长、等等等等。
+
 # 年度绘画总结表格
 
 一个简约黑白线条风格的年度绘画总结表格应用，专为画师记录年度创作。所有文字可实时编辑，图片可上传并智能压缩，最终可将整个表格保存为精美的总结图片。
