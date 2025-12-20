@@ -72,7 +72,6 @@
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
         }
-        /* 移动端优化 */
         
         @media (max-width: 768px) {
             body {
@@ -90,7 +89,6 @@
                 gap: 15px;
             }
         }
-        /* 小屏幕移动端优化 */
         
         @media (max-width: 400px) {
             body {
@@ -107,7 +105,6 @@
             .header::before,
             .header::after {
                 display: none;
-                /* 在小屏幕上隐藏装饰符号 */
             }
             .grid {
                 gap: 10px;
@@ -207,7 +204,6 @@
             outline: 2px solid #333;
             outline-offset: -1px;
         }
-        /* 移动端编辑优化 */
         
         @media (max-width: 768px) {
             .month-title {
@@ -238,7 +234,6 @@
             position: relative;
             overflow: hidden;
             min-height: 44px;
-            /* 移动端最小触摸目标大小 */
             min-width: 120px;
             text-align: center;
             -webkit-tap-highlight-color: transparent;
@@ -292,9 +287,7 @@
             color: #555;
             opacity: 0.5;
             display: none;
-            /* 默认隐藏装饰，移动端不显示 */
         }
-        /* 桌面端显示装饰 */
         
         @media (min-width: 769px) {
             .decoration {
@@ -339,7 +332,6 @@
             opacity: 1;
             transform: translateY(0);
         }
-        /* 移动端通知位置调整 */
         
         @media (max-width: 768px) {
             .notification {
@@ -377,7 +369,6 @@
             max-width: 90%;
             padding: 0 15px;
         }
-        /* 移动端进度提示优化 */
         
         @media (max-width: 768px) {
             .progress-text {
@@ -402,7 +393,78 @@
         .storage-warning.show {
             display: block;
         }
-        /* 移动端触摸优化 */
+        /* 新增：图片预览模态框 */
+        
+        .image-preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        .image-preview-modal.active {
+            display: flex;
+        }
+        
+        .preview-image-container {
+            max-width: 100%;
+            max-height: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+        
+        .preview-image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .preview-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .preview-btn {
+            padding: 10px 20px;
+            background-color: white;
+            border: none;
+            color: #333;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            min-height: 44px;
+        }
+        
+        .preview-btn.save {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .preview-btn.close {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .preview-instruction {
+            color: white;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            text-align: center;
+            max-width: 90%;
+        }
         
         [contenteditable="true"],
         .image-container,
@@ -410,7 +472,6 @@
             -webkit-user-select: auto;
             user-select: auto;
         }
-        /* 防止iOS Safari缩放 */
         
         input,
         textarea,
@@ -418,7 +479,6 @@
         button {
             font-size: 16px;
         }
-        /* 防止长按弹出菜单 */
         
         .month-card,
         .image-container,
@@ -434,7 +494,21 @@
 
     <div class="progress-overlay" id="progressOverlay">
         <div style="font-size: 2.5rem; color: #333;">✎</div>
-        <div class="progress-text" id="progressText">正在处理图片...</div>
+        <div class="progress-text" id="progressText">正在生成图片...</div>
+    </div>
+
+    <!-- 新增：图片预览模态框 -->
+    <div class="image-preview-modal" id="imagePreviewModal">
+        <div class="preview-image-container">
+            <img id="previewImage" alt="预览图片">
+        </div>
+        <div class="preview-controls">
+            <button class="preview-btn save" id="savePreviewBtn">保存图片</button>
+            <button class="preview-btn close" id="closePreviewBtn">关闭</button>
+        </div>
+        <div class="preview-instruction" id="previewInstruction">
+            长按图片并选择"保存图片"即可保存到手机
+        </div>
     </div>
 
     <div class="container" id="capture">
@@ -561,6 +635,13 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // 检测是否在移动端
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+            // 检测浏览器类型
+            const isBaiduBrowser = /baidubrowser/i.test(navigator.userAgent);
+            const isWechat = /MicroMessenger/i.test(navigator.userAgent);
+
             // 显示通知
             function showNotification(message, duration = 3000) {
                 const notification = document.getElementById('notification');
@@ -583,6 +664,38 @@
             function hideProgress() {
                 const overlay = document.getElementById('progressOverlay');
                 overlay.classList.remove('active');
+            }
+
+            // 显示图片预览模态框
+            function showImagePreview(imageSrc) {
+                const modal = document.getElementById('imagePreviewModal');
+                const previewImage = document.getElementById('previewImage');
+                const instruction = document.getElementById('previewInstruction');
+
+                previewImage.src = imageSrc;
+
+                // 根据不同浏览器显示不同的提示
+                if (isBaiduBrowser) {
+                    instruction.textContent = '长按图片并选择"保存图片"即可保存到手机';
+                } else if (isWechat) {
+                    instruction.textContent = '在微信中请点击右上角菜单，选择"在浏览器打开"后保存图片';
+                } else {
+                    instruction.textContent = '长按图片并选择"保存图片"即可保存到手机';
+                }
+
+                modal.classList.add('active');
+
+                // 阻止背景滚动
+                document.body.style.overflow = 'hidden';
+            }
+
+            // 隐藏图片预览模态框
+            function hideImagePreview() {
+                const modal = document.getElementById('imagePreviewModal');
+                modal.classList.remove('active');
+
+                // 恢复背景滚动
+                document.body.style.overflow = '';
             }
 
             // 显示存储警告
@@ -611,9 +724,8 @@
                             let height = img.height;
 
                             // 针对显示需要设置最大尺寸 - 保持宽高比
-                            // 因为最终显示区域只有300x180px，我们不需要保存太大的图片
-                            const MAX_WIDTH = 800; // 最大宽度
-                            const MAX_HEIGHT = 600; // 最大高度
+                            const MAX_WIDTH = 800;
+                            const MAX_HEIGHT = 600;
 
                             // 如果图片很大，先进行缩小
                             if (width > MAX_WIDTH || height > MAX_HEIGHT) {
@@ -635,19 +747,18 @@
                             // 绘制图片
                             ctx.drawImage(img, 0, 0, width, height);
 
-                            // 动态调整质量 - 更激进的压缩策略
-                            let quality = 0.5; // 默认质量降低到0.5
+                            // 动态调整质量
+                            let quality = 0.5;
 
-                            // 根据原始文件大小进一步调整
-                            if (file.size > 15 * 1024 * 1024) { // 大于15MB
+                            if (file.size > 15 * 1024 * 1024) {
                                 quality = 0.4;
-                            } else if (file.size > 10 * 1024 * 1024) { // 大于10MB
+                            } else if (file.size > 10 * 1024 * 1024) {
                                 quality = 0.45;
-                            } else if (file.size > 5 * 1024 * 1024) { // 大于5MB
+                            } else if (file.size > 5 * 1024 * 1024) {
                                 quality = 0.5;
-                            } else if (file.size > 2 * 1024 * 1024) { // 大于2MB
+                            } else if (file.size > 2 * 1024 * 1024) {
                                 quality = 0.6;
-                            } else { // 小于2MB
+                            } else {
                                 quality = 0.7;
                             }
 
@@ -656,16 +767,15 @@
 
                             // 检查压缩后的大小
                             const base64Length = compressedBase64.length;
-                            const sizeInMB = (base64Length * 3 / 4) / (1024 * 1024); // 近似计算MB大小
+                            const sizeInMB = (base64Length * 3 / 4) / (1024 * 1024);
 
                             console.log(`原始大小: ${(file.size / (1024*1024)).toFixed(2)}MB, 压缩后: ${sizeInMB.toFixed(2)}MB`);
 
                             // 如果压缩后仍然大于1MB，尝试进一步压缩
                             if (sizeInMB > 1) {
                                 console.log('图片仍然较大，进行二次压缩...');
-                                // 二次压缩：进一步降低尺寸和质量
                                 const secondaryCanvas = document.createElement('canvas');
-                                const secondaryRatio = 0.7; // 进一步缩小30%
+                                const secondaryRatio = 0.7;
                                 secondaryCanvas.width = Math.floor(width * secondaryRatio);
                                 secondaryCanvas.height = Math.floor(height * secondaryRatio);
 
@@ -674,7 +784,7 @@
                                 secondaryCtx.fillRect(0, 0, secondaryCanvas.width, secondaryCanvas.height);
                                 secondaryCtx.drawImage(img, 0, 0, secondaryCanvas.width, secondaryCanvas.height);
 
-                                const finalQuality = Math.max(0.3, quality * 0.8); // 进一步降低质量
+                                const finalQuality = Math.max(0.3, quality * 0.8);
                                 const finalBase64 = secondaryCanvas.toDataURL('image/jpeg', finalQuality);
                                 resolve(finalBase64);
                             } else {
@@ -689,137 +799,78 @@
                 });
             }
 
-            // 图片上传功能 - 移动端优化
+            // 图片上传功能
             const imageContainers = document.querySelectorAll('.image-container');
 
             imageContainers.forEach(container => {
-                // 添加触摸事件处理
-                let touchStartTime = 0;
+                container.addEventListener('click', function() {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
 
-                container.addEventListener('touchstart', function(e) {
-                    touchStartTime = Date.now();
-                    // 防止触发滚动
-                    if (e.touches.length === 1) {
-                        e.preventDefault();
-                    }
-                }, {
-                    passive: false
-                });
+                    input.onchange = async function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            if (file.size > 20 * 1024 * 1024) {
+                                showNotification('图片太大，请选择小于20MB的图片');
+                                return;
+                            }
 
-                container.addEventListener('touchend', function(e) {
-                    const touchDuration = Date.now() - touchStartTime;
-                    // 防止误触，只有短按才触发上传
-                    if (touchDuration < 500) {
-                        triggerImageUpload(this);
-                    }
-                });
+                            showProgress('正在压缩图片...');
 
-                // 保留原有的点击事件
-                container.addEventListener('click', function(e) {
-                    // 在移动端，如果已经处理了触摸事件，则忽略点击事件
-                    if ('ontouchstart' in window) {
-                        e.preventDefault();
-                    } else {
-                        triggerImageUpload(this);
-                    }
+                            try {
+                                const compressedImage = await compressArtImage(file);
+
+                                const img = document.createElement('img');
+                                img.src = compressedImage;
+
+                                container.innerHTML = '';
+                                container.appendChild(img);
+
+                                const month = container.closest('.month-card').getAttribute('data-month');
+
+                                try {
+                                    localStorage.setItem(`painting-image-${month}`, compressedImage);
+                                    showNotification('图片已保存');
+
+                                    localStorage.setItem(`painting-time-${month}`, Date.now().toString());
+
+                                    manageStorageSpace();
+                                } catch (storageError) {
+                                    console.error('存储失败:', storageError);
+                                    showProgress('存储空间不足，正在清理...');
+
+                                    const success = await forceClearStorage();
+
+                                    if (success) {
+                                        try {
+                                            localStorage.setItem(`painting-image-${month}`, compressedImage);
+                                            localStorage.setItem(`painting-time-${month}`, Date.now().toString());
+                                            showNotification('存储空间已清理，图片已保存');
+                                        } catch (retryError) {
+                                            console.error('重试存储失败:', retryError);
+                                            showNotification('图片太大，无法保存到本地存储');
+                                        }
+                                    } else {
+                                        showNotification('存储空间不足，无法保存图片');
+                                    }
+                                }
+                            } catch (error) {
+                                console.error('图片处理失败:', error);
+                                showNotification('图片处理失败，请重试');
+                            } finally {
+                                hideProgress();
+                            }
+                        }
+                    };
+
+                    input.click();
                 });
             });
 
-            // 触发图片上传的通用函数
-            function triggerImageUpload(container) {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.style.display = 'none';
-
-                // 移动端优化：使用capture属性允许直接调用相机
-                if ('ontouchstart' in window) {
-                    input.setAttribute('capture', 'environment');
-                }
-
-                input.onchange = async function(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        // 检查文件大小 - 增加到20MB
-                        if (file.size > 20 * 1024 * 1024) { // 20MB
-                            showNotification('图片太大，请选择小于20MB的图片');
-                            return;
-                        }
-
-                        showProgress('正在压缩图片...');
-
-                        try {
-                            // 压缩图片
-                            const compressedImage = await compressArtImage(file);
-
-                            const img = document.createElement('img');
-                            img.src = compressedImage;
-
-                            // 清空容器并添加图片
-                            container.innerHTML = '';
-                            container.appendChild(img);
-
-                            // 保存到本地存储
-                            const month = container.closest('.month-card').getAttribute('data-month');
-
-                            // 尝试存储图片
-                            try {
-                                localStorage.setItem(`painting-image-${month}`, compressedImage);
-                                showNotification('图片已保存');
-
-                                // 更新存储时间戳，用于LRU算法
-                                localStorage.setItem(`painting-time-${month}`, Date.now().toString());
-
-                                // 检查并清理存储空间
-                                manageStorageSpace();
-                            } catch (storageError) {
-                                console.error('存储失败:', storageError);
-                                showProgress('存储空间不足，正在清理...');
-
-                                // 强制清理存储空间
-                                const success = await forceClearStorage();
-
-                                if (success) {
-                                    // 再次尝试保存
-                                    try {
-                                        localStorage.setItem(`painting-image-${month}`, compressedImage);
-                                        localStorage.setItem(`painting-time-${month}`, Date.now().toString());
-                                        showNotification('存储空间已清理，图片已保存');
-                                    } catch (retryError) {
-                                        console.error('重试存储失败:', retryError);
-                                        showNotification('图片太大，无法保存到本地存储');
-                                    }
-                                } else {
-                                    showNotification('存储空间不足，无法保存图片');
-                                }
-                            }
-                        } catch (error) {
-                            console.error('图片处理失败:', error);
-                            showNotification('图片处理失败，请重试');
-                        } finally {
-                            hideProgress();
-                        }
-                    }
-                };
-
-                // 移动端特殊处理
-                if ('ontouchstart' in window) {
-                    // 在移动端，直接触发点击
-                    input.click();
-                } else {
-                    // 在桌面端，将input添加到DOM并触发点击
-                    document.body.appendChild(input);
-                    input.click();
-                    setTimeout(() => {
-                        document.body.removeChild(input);
-                    }, 100);
-                }
-            }
-
-            // 存储空间管理函数 - 使用LRU算法
+            // 存储空间管理函数
             function manageStorageSpace() {
                 try {
-                    // 收集所有存储的图片信息
                     const imageEntries = [];
 
                     for (let i = 0; i < localStorage.length; i++) {
@@ -835,14 +886,11 @@
                         }
                     }
 
-                    // 按时间戳排序，最早的在前
                     imageEntries.sort((a, b) => a.timestamp - b.timestamp);
 
-                    // 计算总大小
                     const totalSize = imageEntries.reduce((sum, entry) => sum + entry.size, 0);
-                    const maxSize = 4 * 1024 * 1024; // 限制为4MB
+                    const maxSize = 4 * 1024 * 1024;
 
-                    // 如果超过限制，删除最旧的图片直到满足限制
                     if (totalSize > maxSize) {
                         showStorageWarning();
 
@@ -866,7 +914,6 @@
             async function forceClearStorage() {
                 return new Promise((resolve) => {
                     try {
-                        // 先清理所有图片
                         for (let i = 0; i < localStorage.length; i++) {
                             const key = localStorage.key(i);
                             if (key.startsWith('painting-image-')) {
@@ -877,7 +924,6 @@
                             }
                         }
 
-                        // 然后清理其他可能的大数据
                         const keysToKeep = [
                             'header-title',
                             'month-title-1', 'month-title-2', 'month-title-3', 'month-title-4',
@@ -917,11 +963,10 @@
                 }
             });
 
-            // 保存编辑内容 - 移动端优化
+            // 保存编辑内容
             const editableElements = document.querySelectorAll('[contenteditable="true"]');
 
             editableElements.forEach(element => {
-                // 从本地存储加载内容
                 const card = element.closest('.month-card');
                 const month = card ? card.getAttribute('data-month') : 'header';
 
@@ -939,7 +984,6 @@
                     element.innerHTML = savedContent;
                 }
 
-                // 移动端优化：添加输入事件实时保存
                 let saveTimeout;
                 element.addEventListener('input', function() {
                     clearTimeout(saveTimeout);
@@ -948,13 +992,11 @@
                     }, 1000);
                 });
 
-                // 保存内容
                 element.addEventListener('blur', function() {
                     saveContent(element);
                 });
             });
 
-            // 保存内容的通用函数
             function saveContent(element) {
                 const card = element.closest('.month-card');
                 const month = card ? card.getAttribute('data-month') : 'header';
@@ -971,49 +1013,115 @@
                 try {
                     localStorage.setItem(key, element.innerHTML);
                 } catch (e) {
-                    // 文字内容很小，一般不会超限
+                    // 忽略错误
                 }
             }
 
-            // 导出功能 - 移动端优化
+            // 优化的保存图片功能
             document.getElementById('saveBtn').addEventListener('click', async function() {
-                // 禁用按钮，防止重复点击
                 this.disabled = true;
-                this.textContent = '正在生成图片...';
-                showProgress('正在生成总结图片...');
+                this.textContent = '正在生成...';
+                showProgress('正在生成图片，请稍候...');
 
                 try {
-                    // 生成图片
+                    // 优化html2canvas配置，避免内存问题和白屏
                     const canvas = await html2canvas(document.getElementById('capture'), {
-                        scale: 2,
+                        scale: isMobile ? 1.5 : 2, // 移动端降低scale减少内存占用
                         useCORS: true,
                         logging: false,
-                        backgroundColor: '#ffffff'
+                        backgroundColor: '#ffffff',
+                        removeContainer: true, // 清理临时容器
+                        onclone: function(clonedDoc) {
+                            // 清理不需要的元素，减少内存占用
+                            const progressOverlay = clonedDoc.getElementById('progressOverlay');
+                            if (progressOverlay) progressOverlay.style.display = 'none';
+
+                            const notification = clonedDoc.getElementById('notification');
+                            if (notification) notification.style.display = 'none';
+
+                            // 隐藏不需要的装饰元素
+                            const decorations = clonedDoc.querySelectorAll('.decoration');
+                            decorations.forEach(dec => dec.style.display = 'none');
+                        }
                     });
 
-                    const link = document.createElement('a');
-                    link.download = `年度绘画总结_${new Date().toISOString().slice(0, 10)}.png`;
-                    link.href = canvas.toDataURL('image/png');
+                    hideProgress();
 
-                    // 移动端特殊处理
-                    if ('ontouchstart' in window) {
-                        // 在移动端，使用新的窗口打开
-                        window.open(link.href, '_blank');
-                        showNotification('图片生成完成，请在浏览器中下载');
+                    const imageData = canvas.toDataURL('image/png');
+
+                    // 根据不同设备和浏览器采取不同的保存策略
+                    if (isMobile) {
+                        // 移动端：显示预览，让用户手动保存
+                        showImagePreview(imageData);
+
+                        // 在微信中特殊提示
+                        if (isWechat) {
+                            showNotification('微信中请点击右上角菜单，选择"在浏览器打开"后保存图片', 5000);
+                        }
                     } else {
-                        // 在桌面端，直接下载
+                        // 桌面端：直接下载
+                        const link = document.createElement('a');
+                        link.download = `年度绘画总结_${new Date().toISOString().slice(0, 10)}.png`;
+                        link.href = imageData;
                         link.click();
                         showNotification('图片保存成功，正在下载...');
                     }
                 } catch (error) {
                     console.error('生成图片失败:', error);
-                    showNotification('生成图片失败，请重试');
+                    hideProgress();
+
+                    // 根据错误类型提供不同的提示
+                    if (error.message && error.message.includes('memory') || error.message.includes('timeout')) {
+                        showNotification('生成图片时内存不足，请尝试减少图片数量或重启浏览器');
+                    } else if (error.message && error.message.includes('security')) {
+                        showNotification('安全限制，无法生成图片，请检查浏览器设置');
+                    } else {
+                        showNotification('生成图片失败，请重试或使用截图功能保存');
+                    }
+
+                    // 提供一个备选方案：让用户截图
+                    setTimeout(() => {
+                        if (confirm('生成图片失败，是否使用手机截图功能保存？\n\n可以同时按下音量下键和电源键进行截图。')) {
+                            showNotification('请使用手机截图功能保存当前页面');
+                        }
+                    }, 500);
                 } finally {
-                    // 恢复按钮状态
                     this.disabled = false;
                     this.textContent = '保存为图片';
-                    hideProgress();
                 }
+            });
+
+            // 预览模态框的保存按钮
+            document.getElementById('savePreviewBtn').addEventListener('click', function() {
+                const previewImage = document.getElementById('previewImage');
+                const imageSrc = previewImage.src;
+
+                // 尝试使用不同的保存方法
+                try {
+                    // 方法1：使用a标签下载
+                    const link = document.createElement('a');
+                    link.download = `年度绘画总结_${new Date().toISOString().slice(0, 10)}.png`;
+                    link.href = imageSrc;
+
+                    // 对于移动端，创建一个临时的点击事件
+                    const clickEvent = new MouseEvent('click', {
+                        view: window,
+                        bubbles: true,
+                        cancelable: true
+                    });
+
+                    link.dispatchEvent(clickEvent);
+
+                    showNotification('已尝试保存图片，请根据浏览器提示操作');
+                } catch (error) {
+                    console.error('保存失败:', error);
+                    showNotification('保存失败，请长按图片手动保存');
+                }
+            });
+
+            // 预览模态框的关闭按钮
+            document.getElementById('closePreviewBtn').addEventListener('click', function() {
+                hideImagePreview();
             });
 
             // 清除所有图片按钮
@@ -1022,12 +1130,10 @@
                     showProgress('正在清除图片...');
 
                     try {
-                        // 清除所有图片
                         for (let i = 1; i <= 12; i++) {
                             localStorage.removeItem(`painting-image-${i}`);
                             localStorage.removeItem(`painting-time-${i}`);
 
-                            // 重置显示
                             const container = document.querySelector(`.month-card[data-month="${i}"] .image-container`);
                             if (container) {
                                 container.innerHTML = '<div class="image-placeholder">点击上传图片</div>';
@@ -1064,6 +1170,43 @@
                     }, 100);
                 });
             }
+
+            // 添加长按保存提示
+            document.getElementById('previewImage').addEventListener('touchstart', function(e) {
+                if (e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    const startX = touch.clientX;
+                    const startY = touch.clientY;
+                    const startTime = Date.now();
+
+                    const touchMoveHandler = function(moveEvent) {
+                        const moveTouch = moveEvent.touches[0];
+                        const deltaX = Math.abs(moveTouch.clientX - startX);
+                        const deltaY = Math.abs(moveTouch.clientY - startY);
+
+                        // 如果移动距离太大，取消长按检测
+                        if (deltaX > 10 || deltaY > 10) {
+                            document.removeEventListener('touchmove', touchMoveHandler);
+                            document.removeEventListener('touchend', touchEndHandler);
+                        }
+                    };
+
+                    const touchEndHandler = function() {
+                        const duration = Date.now() - startTime;
+
+                        // 如果长按超过500ms，显示保存提示
+                        if (duration > 500) {
+                            showNotification('长按图片可保存到手机相册');
+                        }
+
+                        document.removeEventListener('touchmove', touchMoveHandler);
+                        document.removeEventListener('touchend', touchEndHandler);
+                    };
+
+                    document.addEventListener('touchmove', touchMoveHandler);
+                    document.addEventListener('touchend', touchEndHandler);
+                }
+            });
         });
     </script>
 </body>
