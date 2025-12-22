@@ -35,7 +35,7 @@ A simple, browser-based tool to upload and showcase your monthly artwork — per
 - 自动生成带日期的时间戳文件名
 - 支持键盘快捷键(Ctrl+S)快速保存
 
-# 🚀 快速开始
+## 🚀 快速开始
 
 在线使用
 直接访问[【年度绘画总结表格在线使用】](http://monthly.morlvoid.pro/)即可开始使用。
@@ -51,7 +51,7 @@ cd MonthlyCanvas
 # 直接用浏览器打开 index.html
 ```
 
-# 📖 使用指南
+## 📖 使用指南
 基础操作
 编辑文字：点击任何文字区域（月份、感想）进行编辑
 
@@ -75,7 +75,7 @@ cd MonthlyCanvas
 
 不同浏览器存储配额可能不同
 
-# 🛠️ 技术栈
+## 🛠️ 技术栈
 前端：HTML5, CSS3, JavaScript (ES6+)
 
 核心库：html2canvas 用于HTML转图片
@@ -84,7 +84,7 @@ cd MonthlyCanvas
 
 压缩算法：Canvas API 图片压缩
 
-# 🏗️ 项目结构
+## 🏗️ 项目结构
 
 ```
 text
@@ -93,7 +93,7 @@ text
 ├── README.md           # 项目说明
 ├── LICENSE             # 开源协议
 ```
-# 🧩 功能实现细节
+## 🧩 功能实现细节
 图片处理流程
 上传检测：验证文件类型和大小(≤20MB)
 
@@ -110,7 +110,7 @@ text
 
 时间戳记录：实现LRU(最近最少使用)算法
 
-# 🌟 设计特色
+## 🌟 设计特色
 视觉设计
 黑白极简：纯粹的黑白线条，无干扰色
 
@@ -125,7 +125,7 @@ text
 
 通知系统：操作结果即时提示
 
-# 🔧 开发相关
+## 🔧 开发相关
 本地开发
 本项目为纯前端项目，无需构建步骤：
 
@@ -146,7 +146,7 @@ Edge 79+ ✓
 
 注：由于使用LocalStorage和Canvas API，需要现代浏览器支持
 
-# 🤝 贡献指南
+## 🤝 贡献指南
 欢迎提交Issue和Pull Request！
 
 Fork 本仓库
@@ -160,15 +160,15 @@ Fork 本仓库
 开启 Pull Request
 
 
-# 📄 开源协议
+## 📄 开源协议
 本项目采用 MIT License 开源协议。
 
-# 📞 联系与支持
+## 📞 联系与支持
 提交 Issue 报告问题
 通过 Pull Request 贡献代码
 Star ⭐ 本项目表示支持
 
-# 🙏 致谢
+## 🙏 致谢
 感谢所有为这个项目提供灵感和帮助的人。
 所有测试用户和贡献者
 让每一幅创作都被记录，让每一份努力都有总结
