@@ -1,5 +1,5 @@
 # MonthlyCanvas
-- A simple, browser-based tool to upload and showcase your monthly artwork — perfect for creating a visual year-in-review.
+A simple, browser-based tool to upload and showcase your monthly artwork — perfect for creating a visual year-in-review.
 - 一个轻量级的网页工具，用于上传并展示你每月的绘画作品，轻松制作属于你的年度艺术回顾。
 - 当然也可以用来记录任何年度总结，这里提供了12个相片与灵感空位，可以用来作为旅行总结、宠物成长、等等等等。
 
@@ -17,6 +17,8 @@
 - 黑白线条风格，无渐变色设计
 - 浅色方格背景，高级感构成
 - 使用画笔、画框等艺术符号装饰
+
+<img width="1965" height="1335" alt="image" src="https://github.com/user-attachments/assets/6ba397aa-18a1-4d1c-b638-9f23652ee862" />
 
 ### 📝 智能编辑
 - **文字可编辑**：所有文字区域点击即可编辑
@@ -91,10 +93,6 @@ text
 ├── index.html          # 主页面
 ├── README.md           # 项目说明
 ├── LICENSE             # 开源协议
-└── assets/             # 资源文件(可选)
-    ├── screenshots/    # 截图
-    └── examples/       # 示例图片
-
 ```
 ## 🧩 功能实现细节
 图片处理流程
@@ -151,17 +149,17 @@ Edge 79+ ✓
 
 ## 🤝 贡献指南
 欢迎提交Issue和Pull Request！
-```
+
 Fork 本仓库
 
-创建功能分支 (git checkout -b feature/MonthlyCanvas)
+创建功能分支 (`git checkout -b feature/MonthlyCanvas`)
 
-提交更改 (git commit -m 'Add some MonthlyCanvas')
+提交更改 (`git commit -m 'Add some MonthlyCanvas'`)
 
-推送分支 (git push origin feature/MonthlyCanvas)
+推送分支 (`git push origin feature/MonthlyCanvas`)
 
 开启 Pull Request
-```
+
 
 ## 📄 开源协议
 本项目采用 MIT License 开源协议。
@@ -176,3 +174,5 @@ Star ⭐ 本项目表示支持
 所有测试用户和贡献者
 让每一幅创作都被记录，让每一份努力都有总结
 为画师打造的年度创作记录工具
+
+最后更新：2025年12月
